@@ -16,8 +16,6 @@ import java.util.List;
 @Table(name = "users")
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class User implements UserDetails {
 
   @Id
@@ -28,11 +26,9 @@ public class User implements UserDetails {
   @Column(unique = true)
   private String username;
 
-  @Column(unique = true)
-  private String email;
-
   private String password;
 
+  @Enumerated(EnumType.STRING)
   private UserRole role;
 
   @Override
@@ -65,6 +61,12 @@ public class User implements UserDetails {
   @Override
   public boolean isCredentialsNonExpired() {
     return false;
+  }
+
+  public User(String username, String password, UserRole role) {
+    this.username = username;
+    this.password = password;
+    this.role = role;
   }
 
   @Override
