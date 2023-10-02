@@ -21,13 +21,12 @@ import java.util.function.Function;
 
 @Service
 public class TokenService {
-  //todo: Migrate to jjwt instead of java-jwt
   @Value("${application.security.token.secret}")
   private String secret;
   @Value("${application.security.token.expiration}")
   private long jwtExpiration;
 
-  public String extractUsername(String token) {
+  public String extractUsername(String token) throws NullPointerException {
     return extractClaim(token, Claims::getSubject);
   }
 
@@ -59,8 +58,13 @@ public class TokenService {
   }
 
   public boolean isTokenValid(String token, UserDetails userDetails) {
-    final String username = extractUsername(token);
-    return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    try {
+      final String username = extractUsername(token);
+      return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    } catch (NullPointerException e) {
+      return false;
+    }
+
   }
 
   public String generateToken(UserDetails userDetails) {

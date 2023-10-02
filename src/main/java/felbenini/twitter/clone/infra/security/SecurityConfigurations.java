@@ -21,11 +21,14 @@ public class SecurityConfigurations {
 
   @Autowired
   private SecurityFilter securityFilter;
+  @Autowired
+  private AuthEntryPointJwt authenticationEntryPoint;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
         .csrf(csrf -> csrf.disable())
+        .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()

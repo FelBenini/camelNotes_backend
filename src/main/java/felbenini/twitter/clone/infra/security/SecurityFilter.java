@@ -1,6 +1,7 @@
 package felbenini.twitter.clone.infra.security;
 
 import felbenini.twitter.clone.user.UserRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
@@ -23,15 +25,21 @@ public class SecurityFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, IOException {
-    var token = this.recoverToken(request);
-    if(token != null){
-      var login = tokenService.extractUsername(token);
-      UserDetails user = userRepository.findByUsername(login);
+    try {
+      var token = this.recoverToken(request);
+      if (token != null) {
+        var login = tokenService.extractUsername(token);
+        UserDetails user = userRepository.findByUsername(login);
 
-      var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (tokenService.isTokenValid(token, user)) {
+          var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+          SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+      }
+      filterChain.doFilter(request, response);
+    } catch (ExpiredJwtException e) {
+      response.setStatus(403);
     }
-    filterChain.doFilter(request, response);
   }
 
   private String recoverToken(HttpServletRequest request){
