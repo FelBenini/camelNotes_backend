@@ -16,6 +16,8 @@ import java.util.List;
 @Table(name = "users")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class User implements UserDetails {
 
   @Id
@@ -50,17 +52,17 @@ public class User implements UserDetails {
 
   @Override
   public boolean isAccountNonExpired() {
-    return false;
+    return true;
   }
 
   @Override
   public boolean isAccountNonLocked() {
-    return false;
+    return true;
   }
 
   @Override
   public boolean isCredentialsNonExpired() {
-    return false;
+    return true;
   }
 
   public User(String username, String password, UserRole role) {
@@ -71,6 +73,6 @@ public class User implements UserDetails {
 
   @Override
   public boolean isEnabled() {
-    return false;
+    return true;
   }
 }

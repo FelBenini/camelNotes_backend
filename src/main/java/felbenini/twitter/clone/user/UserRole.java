@@ -1,9 +1,9 @@
 package felbenini.twitter.clone.user;
 
 public enum UserRole {
-  ADMIN("admin"),
-  USER("user"),
-  MODERATOR("moderator");
+  ADMIN("ADMIN"),
+  USER("USER"),
+  MODERATOR("MODERATOR");
 
   private String role;
 
