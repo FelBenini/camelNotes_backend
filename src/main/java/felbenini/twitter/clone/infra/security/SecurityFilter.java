@@ -2,6 +2,7 @@ package felbenini.twitter.clone.infra.security;
 
 import felbenini.twitter.clone.user.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +38,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         }
       }
       filterChain.doFilter(request, response);
-    } catch (ExpiredJwtException e) {
+    } catch (ExpiredJwtException | SignatureException e) {
       response.setStatus(403);
     }
   }

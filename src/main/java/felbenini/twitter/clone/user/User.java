@@ -1,5 +1,6 @@
 package felbenini.twitter.clone.user;
 
+import felbenini.twitter.clone.profile.Profile;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,17 +22,16 @@ import java.util.List;
 public class User implements UserDetails {
 
   @Id
-  @SequenceGenerator(name = "student_sequence", sequenceName = "student_sequence", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_sequence")
-  private Long id;
-
+  @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(name = "userId")
+  private String id;
   @Column(unique = true)
   private String username;
-
   private String password;
-
   @Enumerated(EnumType.STRING)
   private UserRole role;
+  @OneToOne(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+  private Profile profile;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -65,10 +65,11 @@ public class User implements UserDetails {
     return true;
   }
 
-  public User(String username, String password, UserRole role) {
+  public User(String username, String password) {
     this.username = username;
     this.password = password;
-    this.role = role;
+    this.role = UserRole.USER;
+    this.profile = new Profile(username, username, Long.valueOf(0), Long.valueOf(0));
   }
 
   @Override
