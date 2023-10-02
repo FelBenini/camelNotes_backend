@@ -2,6 +2,7 @@ package felbenini.twitter.clone.user;
 
 import felbenini.twitter.clone.profile.Profile;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,8 @@ public class User implements UserDetails {
   @Column(unique = true)
   private String username;
   private String password;
+  @Email
+  private String email;
   @Enumerated(EnumType.STRING)
   private UserRole role;
   @OneToOne(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
@@ -65,10 +68,15 @@ public class User implements UserDetails {
     return true;
   }
 
-  public User(String username, String password) {
+  public String getEmail() {
+    return this.email;
+  }
+
+  public User(String username, String password, String email) {
     this.username = username;
     this.password = password;
     this.role = UserRole.USER;
+    this.email = email;
     this.profile = new Profile(username, username, Long.valueOf(0), Long.valueOf(0));
   }
 
