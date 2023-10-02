@@ -30,7 +30,7 @@ public class SecurityConfigurations {
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
             .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/v1/sample").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/sample").hasRole("USER")
             .requestMatchers("/error").permitAll()
             .anyRequest().authenticated()
         )
