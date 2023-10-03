@@ -30,6 +30,7 @@ public class User implements UserDetails {
   private String username;
   private String password;
   @Email
+  @Column(unique = true)
   private String email;
   @Enumerated(EnumType.STRING)
   private UserRole role;
@@ -77,7 +78,7 @@ public class User implements UserDetails {
     this.password = password;
     this.role = UserRole.USER;
     this.email = email;
-    this.profile = new Profile(username, username, Long.valueOf(0), Long.valueOf(0));
+    this.profile = new Profile(username, username);
   }
 
   @Override

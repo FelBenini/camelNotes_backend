@@ -29,7 +29,7 @@ public class AuthController {
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
-    if (this.userRepository.findByUsername(data.username()) != null) throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+    if (this.userRepository.findByUsername(data.username()) != null || this.userRepository.findByEmail(data.email()) != null) throw new ResponseStatusException(HttpStatus.CONFLICT);
     String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
     User user = new User(
         data.username(),

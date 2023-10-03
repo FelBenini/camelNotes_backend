@@ -2,6 +2,7 @@ package felbenini.twitter.clone.profile;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import felbenini.twitter.clone.post.Post;
 import felbenini.twitter.clone.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,75 +43,13 @@ public class Profile {
   @ManyToMany(mappedBy = "followers")
   @JsonManagedReference
   private Set<Profile> following = new HashSet<>();
+  @OneToMany(mappedBy = "profile", fetch = FetchType.LAZY)
+  private Set<Post> posts;
 
-  public Profile(String username, String displayName, Long followers, Long following) {
+  public Profile(String username, String displayName) {
     this.username = username;
     this.displayName = displayName;
-    this.followersCount = Long.valueOf(0);
-    this.followingCount = Long.valueOf(0);
-  }
-
-  public String getDescription() {
-    return this.description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public String getProfileId() {
-    return profileId;
-  }
-
-  public void setProfileId(String profileId) {
-    this.profileId = profileId;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public Set<Profile> getFollowing() {
-    return following;
-  }
-
-  public void setFollowing(Set<Profile> following) {
-    this.following = following;
-  }
-
-  public String getDisplayName() {
-    return displayName;
-  }
-
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
-  }
-
-  public Long getFollowersCount() {
-    return followersCount;
-  }
-
-  public void setFollowersCount(Long followers) {
-    this.followersCount = followers;
-  }
-
-  public Long getFollowingCount() {
-    return followingCount;
-  }
-
-  public void setFollowingCount(Long following) {
-    this.followingCount = following;
-  }
-
-  public Set<Profile> getFollowers() {
-    return followers;
-  }
-
-  public void setFollowers(Set<Profile> followers) {
-    this.followers = followers;
+    this.followersCount = 0L;
+    this.followingCount = 0L;
   }
 }
