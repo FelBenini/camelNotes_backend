@@ -1,15 +1,18 @@
 package felbenini.twitter.clone.profile;
 
+import felbenini.twitter.clone.infra.security.TokenService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/profile")
@@ -18,15 +21,37 @@ import org.springframework.web.server.ResponseStatusException;
 public class ProfileController {
   @Autowired
   private ProfileRepository profileRepository;
+  @Autowired
+  private ProfileService profileService;
+  @Autowired
+  private TokenService tokenService;
 
   @GetMapping("/{username}")
   public ResponseEntity getProfile(@PathVariable("username") String username) {
     Profile profile = profileRepository.findByUsername(username);
     if (profile == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-    return ResponseEntity.ok(new ProfileResponseDTO(profile.getUsername(),
-        profile.getFollowersCount(),
-        profile.getFollowingCount(),
-        profile.getDisplayName()
-    ));
+    return ResponseEntity.ok(new ProfileResponseDTO(profile));
   }
+
+  @PostMapping("/follow/{username}")
+  public ResponseEntity followProfile(@PathVariable("username") String username, @RequestHeader(value = "Authorization") String authHeader) {
+    String followingUsername = tokenService.extractUsername(authHeader.replace("Bearer ", ""));
+    boolean isFollowing = profileService.toggleFollow(username, followingUsername);
+    if (isFollowing) {
+      return ResponseEntity.ok("Followed successfully");
+    } else {
+      return ResponseEntity.ok("Unfollowed successfully");
+    }
+  }
+
+  @GetMapping("/{username}/followers")
+  public ResponseEntity getFollowers(@PathVariable("username") String username) {
+    Profile profile = profileRepository.findByUsername(username);
+    if (profile == null) return ResponseEntity.notFound().build();
+    Pageable page = PageRequest.of(0, 15);
+    Page<Profile> followers = profileRepository.findByFollowing_Username(username, page);
+    Page<ProfileResponseDTO> followersDTO = followers.map(ProfileResponseDTO::new);
+    return ResponseEntity.ok(followersDTO);
+  }
+
 }

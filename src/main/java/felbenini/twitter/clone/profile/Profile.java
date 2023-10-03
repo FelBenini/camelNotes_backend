@@ -1,5 +1,7 @@
 package felbenini.twitter.clone.profile;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import felbenini.twitter.clone.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,17 +31,31 @@ public class Profile {
   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "userId")
   private User user;
-  @ManyToMany
+  private String description;
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinColumn(
       name = "follows"
   )
+  @JsonBackReference
   private Set<Profile> followers = new HashSet<>();
+
+  @ManyToMany(mappedBy = "followers")
+  @JsonManagedReference
+  private Set<Profile> following = new HashSet<>();
 
   public Profile(String username, String displayName, Long followers, Long following) {
     this.username = username;
     this.displayName = displayName;
     this.followersCount = Long.valueOf(0);
     this.followingCount = Long.valueOf(0);
+  }
+
+  public String getDescription() {
+    return this.description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public String getProfileId() {
@@ -56,6 +72,14 @@ public class Profile {
 
   public void setUsername(String username) {
     this.username = username;
+  }
+
+  public Set<Profile> getFollowing() {
+    return following;
+  }
+
+  public void setFollowing(Set<Profile> following) {
+    this.following = following;
   }
 
   public String getDisplayName() {
@@ -78,7 +102,15 @@ public class Profile {
     return followingCount;
   }
 
-  public void setFollowing(Long following) {
+  public void setFollowingCount(Long following) {
     this.followingCount = following;
+  }
+
+  public Set<Profile> getFollowers() {
+    return followers;
+  }
+
+  public void setFollowers(Set<Profile> followers) {
+    this.followers = followers;
   }
 }
