@@ -4,9 +4,6 @@ import felbenini.twitter.clone.infra.security.TokenService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,13 +42,8 @@ public class ProfileController {
   }
 
   @GetMapping("/{username}/followers")
-  public ResponseEntity getFollowers(@PathVariable("username") String username) {
-    Profile profile = profileRepository.findByUsername(username);
-    if (profile == null) return ResponseEntity.notFound().build();
-    Pageable page = PageRequest.of(0, 15);
-    Page<Profile> followers = profileRepository.findByFollowing_Username(username, page);
-    Page<ProfileResponseDTO> followersDTO = followers.map(ProfileResponseDTO::new);
-    return ResponseEntity.ok(followersDTO);
+  public ResponseEntity getFollowers(@PathVariable("username") String username, @RequestParam(value = "page", required = false) Integer page) {
+    if (page == null) page = 1;
+    return profileService.findFollowers(username, page);
   }
-
 }
