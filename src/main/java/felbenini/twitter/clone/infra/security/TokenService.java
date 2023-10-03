@@ -45,6 +45,10 @@ public class TokenService {
         .getBody();
   }
 
+  public Claims extractAllTheClaims(String token) {
+    return this.extractAllClaims(token);
+  }
+
   private Date extractExpiration(String token) {
     return extractClaim(token, Claims::getExpiration);
   }

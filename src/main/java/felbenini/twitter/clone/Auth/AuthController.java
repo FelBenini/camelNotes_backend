@@ -29,7 +29,6 @@ public class AuthController {
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
-    //todo: fix this shitty 500 coming from the findByUsername
     if (this.userRepository.findByUsername(data.username()) != null) throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
     String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
     User user = new User(
@@ -49,5 +48,12 @@ public class AuthController {
     var token = tokenService.generateToken((User) auth.getPrincipal());
 
     return ResponseEntity.ok(new LoginResponseDTO(token));
+  }
+
+  @GetMapping("/session")
+  @ResponseStatus(HttpStatus.OK)
+  public ResponseEntity session(@RequestHeader(value = "Authorization") String authHeader) {
+    var session = tokenService.extractAllTheClaims(authHeader.replace("Bearer ", ""));
+    return ResponseEntity.ok(session);
   }
 }

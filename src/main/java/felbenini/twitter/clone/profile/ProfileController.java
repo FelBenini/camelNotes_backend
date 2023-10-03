@@ -1,6 +1,7 @@
 package felbenini.twitter.clone.profile;
 
 import felbenini.twitter.clone.infra.security.TokenService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,5 +46,16 @@ public class ProfileController {
   public ResponseEntity getFollowers(@PathVariable("username") String username, @RequestParam(value = "page", required = false) Integer page) {
     if (page == null) page = 1;
     return profileService.findFollowers(username, page);
+  }
+
+  @PutMapping("/edit")
+  public ResponseEntity editProfile(@RequestHeader(value = "Authorization") String authToken, @RequestBody @Valid ProfileEditDTO data) {
+    String username = tokenService.extractUsername(authToken.replace("Bearer ", ""));
+    Profile userProfile = profileRepository.findByUsername(username);
+    if (userProfile == null) return ResponseEntity.notFound().build();
+    userProfile.setDisplayName(data.displayName());
+    userProfile.setDescription(data.description());
+    profileRepository.save(userProfile);
+    return ResponseEntity.ok(new ProfileResponseDTO(userProfile));
   }
 }
