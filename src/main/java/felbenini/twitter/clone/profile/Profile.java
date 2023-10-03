@@ -29,22 +29,28 @@ public class Profile {
   private String displayName;
   private Long followersCount;
   private Long followingCount;
+
   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "userId")
   private User user;
   private String description;
+
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinColumn(
-      name = "follows"
-  )
+  @JoinColumn(name = "follows")
   @JsonBackReference
   private Set<Profile> followers = new HashSet<>();
 
   @ManyToMany(mappedBy = "followers")
   @JsonManagedReference
   private Set<Profile> following = new HashSet<>();
+
   @OneToMany(mappedBy = "profile", fetch = FetchType.LAZY)
+  @JsonBackReference
   private Set<Post> posts;
+
+  @ManyToMany(mappedBy = "likedBy")
+  @JsonManagedReference
+  private Set<Post> likedPosts = new HashSet<>();
 
   public Profile(String username, String displayName) {
     this.username = username;
