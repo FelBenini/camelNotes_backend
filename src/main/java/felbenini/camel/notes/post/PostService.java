@@ -42,9 +42,10 @@ public class PostService {
     return ResponseEntity.ok(new PostResponseDTO(post));
   }
 
-  public ResponseEntity getPostsFromFollowing(String token) {
+  public ResponseEntity getPostsFromFollowing(String token, Integer pageNumber) {
     Profile profile = profileService.extractProfileFromToken(token);
-    Page<Post> posts = postRepository.findByProfileIn(new ArrayList<>(profile.getFollowing()), PageRequest.of(0, 15, Sort.by(Sort.Direction.DESC, "postedAt")));
+    Integer page = pageNumber - 1;
+    Page<Post> posts = postRepository.findByProfileIn(new ArrayList<>(profile.getFollowing()), PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "postedAt")));
     return ResponseEntity.ok(posts);
   }
 }

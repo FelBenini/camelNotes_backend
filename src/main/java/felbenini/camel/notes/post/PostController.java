@@ -20,7 +20,8 @@ public class PostController {
     return this.postService.getPostsFromUser(username, page);
   }
   @GetMapping("/feed")
-  public ResponseEntity getFollowingPosts(@RequestHeader(value = "Authorization") String token) {
-    return this.postService.getPostsFromFollowing(token);
+  public ResponseEntity getFollowingPosts(@RequestHeader(value = "Authorization") String token, @RequestParam(value = "page", required = false) Integer page) {
+    if (page == null) page = 1;
+    return this.postService.getPostsFromFollowing(token, page);
   }
 }
