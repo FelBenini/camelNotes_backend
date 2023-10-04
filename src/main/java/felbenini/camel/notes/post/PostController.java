@@ -19,4 +19,8 @@ public class PostController {
   public ResponseEntity getPostsByUser(@PathVariable("username") String username, @RequestParam(value = "page", required = false) Integer page) {
     return this.postService.getPostsFromUser(username, page);
   }
+  @GetMapping("/feed")
+  public ResponseEntity getFollowingPosts(@RequestHeader(value = "Authorization") String token) {
+    return this.postService.getPostsFromFollowing(token);
+  }
 }

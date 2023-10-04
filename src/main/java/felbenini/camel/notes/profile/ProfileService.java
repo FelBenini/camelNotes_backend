@@ -1,5 +1,6 @@
 package felbenini.camel.notes.profile;
 
+import felbenini.camel.notes.infra.security.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 public class ProfileService {
   @Autowired
   private ProfileRepository profileRepository;
+  @Autowired
+  private TokenService tokenService;
 
   public boolean toggleFollow(String followedUsername, String followerUsername) {
     Profile follower = profileRepository.findByUsername(followerUsername);
@@ -45,5 +48,11 @@ public class ProfileService {
     Page<Profile> followers = profileRepository.findByFollowing_Username(username, paginated);
     Page<ProfileResponseDTO> followersDTO = followers.map(ProfileResponseDTO::new);
     return ResponseEntity.ok(followersDTO);
+  }
+
+  public Profile extractProfileFromToken(String token) {
+    token = token.replace("Bearer ", "");
+    String username = this.tokenService.extractUsername(token);
+    return profileRepository.findByUsername(username);
   }
 }
