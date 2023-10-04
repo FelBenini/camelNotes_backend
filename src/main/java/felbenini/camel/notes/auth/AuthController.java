@@ -1,4 +1,4 @@
-package felbenini.camel.notes.Auth;
+package felbenini.camel.notes.auth;
 
 import felbenini.camel.notes.user.User;
 import felbenini.camel.notes.user.UserRepository;

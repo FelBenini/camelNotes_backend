@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 
 @Service
@@ -17,8 +19,8 @@ public class ProfileService {
   private TokenService tokenService;
 
   public boolean toggleFollow(String followedUsername, String followerUsername) {
-    Profile follower = profileRepository.findByUsername(followerUsername);
-    Profile followed = profileRepository.findByUsername(followedUsername);
+    Profile follower = this.profileRepository.findByUsername(followerUsername);
+    Profile followed = this.profileRepository.findByUsername(followedUsername);
     if (follower != null && followed != null) {
       if (followed.getFollowers().contains(follower)) {
         follower.getFollowing().remove(followed);
@@ -33,19 +35,19 @@ public class ProfileService {
         follower.setFollowingCount(Long.sum(follower.getFollowingCount(), 1L));
         followed.setFollowersCount(Long.sum(follower.getFollowersCount(), 1L));
       }
-      profileRepository.save(follower);
-      profileRepository.save(followed);
+      this.profileRepository.save(follower);
+      this.profileRepository.save(followed);
       return follower.getFollowing().contains(followed);
     }
-    return false;
+    throw new ResponseStatusException(HttpStatus.NOT_FOUND);
   }
 
   public ResponseEntity findFollowers(String username, Integer pageNumber) {
     int page = pageNumber - 1;
-    Profile profile = profileRepository.findByUsername(username);
+    Profile profile = this.profileRepository.findByUsername(username);
     if (profile == null) return ResponseEntity.notFound().build();
     Pageable paginated = PageRequest.of(page, 15);
-    Page<Profile> followers = profileRepository.findByFollowing_Username(username, paginated);
+    Page<Profile> followers = this.profileRepository.findByFollowing_Username(username, paginated);
     Page<ProfileResponseDTO> followersDTO = followers.map(ProfileResponseDTO::new);
     return ResponseEntity.ok(followersDTO);
   }
@@ -53,6 +55,15 @@ public class ProfileService {
   public Profile extractProfileFromToken(String token) {
     token = token.replace("Bearer ", "");
     String username = this.tokenService.extractUsername(token);
-    return profileRepository.findByUsername(username);
+    return this.profileRepository.findByUsername(username);
+  }
+
+  public ResponseEntity editProfile(String authToken, ProfileEditDTO data) {
+    Profile userProfile = this.extractProfileFromToken(authToken);
+    if (userProfile == null) return ResponseEntity.notFound().build();
+    userProfile.setDisplayName(data.displayName());
+    userProfile.setDescription(data.description());
+    profileRepository.save(userProfile);
+    return ResponseEntity.ok(new ProfileResponseDTO(userProfile));
   }
 }

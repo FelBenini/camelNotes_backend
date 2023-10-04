@@ -1,4 +1,4 @@
-package felbenini.camel.notes.Auth;
+package felbenini.camel.notes.auth;
 
 public record LoginResponseDTO(String token) {
 }

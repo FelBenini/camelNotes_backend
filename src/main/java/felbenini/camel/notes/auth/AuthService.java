@@ -1,4 +1,4 @@
-package felbenini.camel.notes.services;
+package felbenini.camel.notes.auth;
 
 import felbenini.camel.notes.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

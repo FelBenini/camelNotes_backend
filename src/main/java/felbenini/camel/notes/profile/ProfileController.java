@@ -48,11 +48,6 @@ public class ProfileController {
 
   @PutMapping("/edit")
   public ResponseEntity editProfile(@RequestHeader(value = "Authorization") String authToken, @RequestBody @Valid ProfileEditDTO data) {
-    Profile userProfile = profileService.extractProfileFromToken(authToken);
-    if (userProfile == null) return ResponseEntity.notFound().build();
-    userProfile.setDisplayName(data.displayName());
-    userProfile.setDescription(data.description());
-    profileRepository.save(userProfile);
-    return ResponseEntity.ok(new ProfileResponseDTO(userProfile));
+    return profileService.editProfile(authToken, data);
   }
 }
