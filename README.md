@@ -1,4 +1,4 @@
-# camelNotes - Backend
+# 🐪 camelNotes - Backend
 
 This is the repository for the backend of the project camelNotes, a full-stack social media project.
 ## Stack
