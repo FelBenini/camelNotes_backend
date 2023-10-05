@@ -15,6 +15,8 @@ public class PostResponseDTO {
   private Long likeCount;
   private PostType type;
   private ProfileResponseDTO profile;
+  private PostResponseDTO mainPost;
+  private Long replyCount;
 
   public PostResponseDTO(
       Post post
@@ -25,5 +27,11 @@ public class PostResponseDTO {
     this.likeCount = post.getLikeCount();
     this.type = post.getType();
     this.profile = new ProfileResponseDTO(post.getProfile());
+    if (post.getMainPost() == null) {
+      this.mainPost = null;
+    } else {
+      this.mainPost = new PostResponseDTO(post.getMainPost());
+    }
+    this.replyCount = post.getReplyCount();
   }
 }

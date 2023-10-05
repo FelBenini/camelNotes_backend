@@ -73,4 +73,26 @@ public class PostService {
     postRepository.save(postValue);
     return ResponseEntity.ok("Added the like to the post");
   }
+
+  public ResponseEntity replyToAPost(String postId, String token, PostRequestDTO data) {
+    Profile profile = profileService.extractProfileFromToken(token);
+    Optional<Post> mainPost = postRepository.findById(postId);
+    if (mainPost.isEmpty()) return ResponseEntity.notFound().build();
+    Post postValue = mainPost.get();
+    Post reply = new Post(data.getContent(), profile, postValue);
+    postValue.getReplies().add(reply);
+    reply.setMainPost(postValue);
+    postValue.setReplyCount(postValue.getReplyCount() + 1);
+    postRepository.save(postValue);
+    postRepository.save(reply);
+    return ResponseEntity.ok(new PostResponseDTO(reply));
+  }
+
+  public ResponseEntity getReplies(String postId, Integer page) {
+    Optional<Post> post = postRepository.findById(postId);
+    if (post.isEmpty()) return ResponseEntity.notFound().build();
+    Page<Post> replies = postRepository.findByMainPost_Id(postId, PageRequest.of(page - 1, 15));
+    Page<PostResponseDTO> repliesDTO = replies.map(PostResponseDTO::new);
+    return ResponseEntity.ok(repliesDTO);
+  }
 }

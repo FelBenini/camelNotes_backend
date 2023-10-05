@@ -33,4 +33,15 @@ public class PostController {
   public ResponseEntity likeAPost(@PathVariable("id") String id, @RequestHeader(value = "Authorization") String token) {
     return this.postService.likeAPost(id, token);
   }
+
+  @PostMapping("/reply/{id}")
+  public ResponseEntity reply(@PathVariable("id") String id, @RequestHeader(value = "Authorization") String token, @RequestBody @Valid PostRequestDTO data) {
+    return this.postService.replyToAPost(id, token, data);
+  }
+
+  @GetMapping("/replies/{id}")
+  public ResponseEntity getReplies(@PathVariable("id") String id, @RequestParam(value = "page", required = false) Integer page) {
+    if (page == null) page = 1;
+    return this.postService.getReplies(id, page);
+  }
 }
