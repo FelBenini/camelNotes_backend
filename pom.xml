@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>felbenini</groupId>
-	<artifactId>twitter.clone</artifactId>
+	<artifactId>camel.notes</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Twitter Clone API</name>
-	<description>Twitter Clone Spring Boot API</description>
+	<name>camelNotes Backend</name>
+	<description>camelNotes Spring Boot API</description>
 	<properties>
 		<java.version>20</java.version>
 	</properties>
