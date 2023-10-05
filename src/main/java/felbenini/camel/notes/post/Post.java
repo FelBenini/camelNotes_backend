@@ -31,7 +31,7 @@ public class Post {
   @JoinColumn(name = "profileId", nullable = false)
   @JsonManagedReference
   private Profile profile;
-  private Long likeCount = 0L;
+  private Long likeCount;
   private PostType type;
   private boolean published = true;
 
@@ -39,10 +39,17 @@ public class Post {
   @JoinColumn(name = "likedBy")
   @JsonBackReference
   private Set<Profile> likedBy = new HashSet<>();
+  private double hotnessScore;
 
   public Post(String content, Profile profile, PostType type) {
     this.content = content;
     this.profile = profile;
     this.type = type;
+    this.likeCount = 0L;
+    this.hotnessScore = this.likeCount * 0.6 + ((double) this.postedAt.toEpochMilli() / 3600000000L) * 0.4;
+  }
+
+  public void updateHotnessScore() {
+    this.hotnessScore = this.likeCount * 0.6 + ((double) this.postedAt.toEpochMilli() / 3600000000L) * 0.4;
   }
 }

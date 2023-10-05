@@ -24,4 +24,13 @@ public class PostController {
     if (page == null) page = 1;
     return this.postService.getPostsFromFollowing(token, page);
   }
+  @GetMapping("/hot-posts")
+  public ResponseEntity getHotPosts(@RequestParam(value = "page", required = false) Integer page) {
+    if (page == null) page = 1;
+    return this.postService.getHotPosts(page);
+  }
+  @PostMapping("/like/{id}")
+  public ResponseEntity likeAPost(@PathVariable("id") String id, @RequestHeader(value = "Authorization") String token) {
+    return this.postService.likeAPost(id, token);
+  }
 }
