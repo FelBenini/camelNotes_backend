@@ -28,9 +28,9 @@ public class PostController {
   }
 
   @GetMapping("/hot-posts")
-  public ResponseEntity getHotPosts(@RequestParam(value = "page", required = false) Integer page) {
+  public ResponseEntity getHotPosts(@RequestParam(value = "page", required = false) Integer page, @RequestHeader(value = "Authorization", required = false) String token) {
     if (page == null) page = 1;
-    return this.postService.getHotPosts(page);
+    return this.postService.getHotPosts(page, token);
   }
 
   @PostMapping("/like/{id}")
@@ -50,9 +50,9 @@ public class PostController {
   }
 
   @GetMapping("/replies/{id}")
-  public ResponseEntity getReplies(@PathVariable("id") String id, @RequestParam(value = "page", required = false) Integer page) {
+  public ResponseEntity getReplies(@PathVariable("id") String id, @RequestParam(value = "page", required = false) Integer page, @RequestHeader(value = "Authorization", required = false) String token) {
     if (page == null) page = 1;
-    return this.postService.getReplies(id, page);
+    return this.postService.getReplies(id, page, token);
   }
 
 }
