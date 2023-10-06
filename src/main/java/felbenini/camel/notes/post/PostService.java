@@ -2,6 +2,7 @@ package felbenini.camel.notes.post;
 
 import felbenini.camel.notes.profile.ProfileRepository;
 import felbenini.camel.notes.profile.Profile;
+import felbenini.camel.notes.profile.ProfileResponseDTO;
 import felbenini.camel.notes.profile.ProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -94,5 +95,13 @@ public class PostService {
     Page<Post> replies = postRepository.findByMainPost_Id(postId, PageRequest.of(page - 1, 15));
     Page<PostResponseDTO> repliesDTO = replies.map(PostResponseDTO::new);
     return ResponseEntity.ok(repliesDTO);
+  }
+
+  public ResponseEntity getLikes(String id, Integer page) {
+    Optional<Post> post = postRepository.findById(id);
+    if (post.isEmpty()) return ResponseEntity.notFound().build();
+    Page<Profile> usersThatLiked = profileRepository.findByLikedPosts_Id(post.get().getId(), PageRequest.of(page - 1, 15));
+    Page<ProfileResponseDTO> usersThatLikedResponse = usersThatLiked.map(ProfileResponseDTO::new);
+    return ResponseEntity.ok(usersThatLikedResponse);
   }
 }

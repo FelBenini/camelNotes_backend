@@ -15,23 +15,33 @@ public class PostController {
   public ResponseEntity createPost(@RequestBody @Valid PostRequestDTO data, @RequestHeader(value = "Authorization") String authHeader) {
     return postService.createPost(data, authHeader);
   }
+
   @GetMapping("/{username}")
   public ResponseEntity getPostsByUser(@PathVariable("username") String username, @RequestParam(value = "page", required = false) Integer page) {
     return this.postService.getPostsFromUser(username, page);
   }
+
   @GetMapping("/feed")
   public ResponseEntity getFollowingPosts(@RequestHeader(value = "Authorization") String token, @RequestParam(value = "page", required = false) Integer page) {
     if (page == null) page = 1;
     return this.postService.getPostsFromFollowing(token, page);
   }
+
   @GetMapping("/hot-posts")
   public ResponseEntity getHotPosts(@RequestParam(value = "page", required = false) Integer page) {
     if (page == null) page = 1;
     return this.postService.getHotPosts(page);
   }
+
   @PostMapping("/like/{id}")
   public ResponseEntity likeAPost(@PathVariable("id") String id, @RequestHeader(value = "Authorization") String token) {
     return this.postService.likeAPost(id, token);
+  }
+
+  @GetMapping("/likes/{id}")
+  public ResponseEntity getLikesFromAPost(@PathVariable("id") String id, @RequestParam(value = "page", required = false) Integer page) {
+    if (page == null) page = 1;
+    return this.postService.getLikes(id, page);
   }
 
   @PostMapping("/reply/{id}")
@@ -44,4 +54,5 @@ public class PostController {
     if (page == null) page = 1;
     return this.postService.getReplies(id, page);
   }
+
 }
