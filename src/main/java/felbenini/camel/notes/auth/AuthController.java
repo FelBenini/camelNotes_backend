@@ -35,7 +35,10 @@ public class AuthController {
         data.email()
     );
     this.userRepository.save(user);
-    return ResponseEntity.ok().build();
+    var authUser = new UsernamePasswordAuthenticationToken(data.username(), data.password());
+    var auth = this.authenticationManager.authenticate(authUser);
+    var token = tokenService.generateToken((User) auth.getPrincipal());
+    return ResponseEntity.ok(new LoginResponseDTO(token));
   }
 
   @PostMapping("/login")
