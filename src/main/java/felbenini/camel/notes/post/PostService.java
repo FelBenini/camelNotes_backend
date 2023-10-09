@@ -2,6 +2,7 @@ package felbenini.camel.notes.post;
 
 import felbenini.camel.notes.profile.ProfileRepository;
 import felbenini.camel.notes.profile.Profile;
+import felbenini.camel.notes.profile.ProfileResponseDTO;
 import felbenini.camel.notes.profile.ProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -49,9 +50,9 @@ public class PostService {
     return ResponseEntity.ok(postsResponse);
   }
 
-  public ResponseEntity getHotPosts(Integer page) {
+  public ResponseEntity getHotPosts(Integer page, String token) {
     Page<Post> posts = this.postRepository.findAll(PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.DESC, "hotnessScore")));
-    Page<PostResponseDTO> postsResponse = posts.map(PostResponseDTO::new);
+    Page<PostResponseDTO> postsResponse = posts.map(post -> new PostResponseDTO(post, this.checkIfPostIsLikedWithToken(token, post)));
     return ResponseEntity.ok(postsResponse);
   }
 
@@ -72,5 +73,41 @@ public class PostService {
     postValue.updateHotnessScore();
     postRepository.save(postValue);
     return ResponseEntity.ok("Added the like to the post");
+  }
+
+  public ResponseEntity replyToAPost(String postId, String token, PostRequestDTO data) {
+    Profile profile = profileService.extractProfileFromToken(token);
+    Optional<Post> mainPost = postRepository.findById(postId);
+    if (mainPost.isEmpty()) return ResponseEntity.notFound().build();
+    Post postValue = mainPost.get();
+    Post reply = new Post(data.getContent(), profile, postValue);
+    postValue.getReplies().add(reply);
+    reply.setMainPost(postValue);
+    postValue.setReplyCount(postValue.getReplyCount() + 1);
+    postRepository.save(postValue);
+    postRepository.save(reply);
+    return ResponseEntity.ok(new PostResponseDTO(reply, this.checkIfPostIsLikedWithToken(token, reply)));
+  }
+
+  public ResponseEntity getReplies(String postId, Integer page, String token) {
+    Optional<Post> post = postRepository.findById(postId);
+    if (post.isEmpty()) return ResponseEntity.notFound().build();
+    Page<Post> replies = postRepository.findByMainPost_Id(postId, PageRequest.of(page - 1, 15));
+    Page<PostResponseDTO> repliesDTO = replies.map(p -> new PostResponseDTO(p, this.checkIfPostIsLikedWithToken(token, p)));
+    return ResponseEntity.ok(repliesDTO);
+  }
+
+  public ResponseEntity getLikes(String id, Integer page) {
+    Optional<Post> post = postRepository.findById(id);
+    if (post.isEmpty()) return ResponseEntity.notFound().build();
+    Page<Profile> usersThatLiked = profileRepository.findByLikedPosts_Id(post.get().getId(), PageRequest.of(page - 1, 15));
+    Page<ProfileResponseDTO> usersThatLikedResponse = usersThatLiked.map(ProfileResponseDTO::new);
+    return ResponseEntity.ok(usersThatLikedResponse);
+  }
+
+  public boolean checkIfPostIsLikedWithToken(String token, Post post) {
+    if (token == null) return false;
+    Profile profile = profileService.extractProfileFromToken(token);
+    return post.getLikedBy().contains(profile);
   }
 }

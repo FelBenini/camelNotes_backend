@@ -19,6 +19,7 @@ public class ProfileService {
   private TokenService tokenService;
 
   public boolean toggleFollow(String followedUsername, String followerUsername) {
+    if (followedUsername == followerUsername) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     Profile follower = this.profileRepository.findByUsername(followerUsername);
     Profile followed = this.profileRepository.findByUsername(followedUsername);
     if (follower != null && followed != null) {

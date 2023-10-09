@@ -41,11 +41,32 @@ public class Post {
   private Set<Profile> likedBy = new HashSet<>();
   private double hotnessScore;
 
+  @ManyToOne
+  @JoinColumn(name = "mainPostId", nullable = true)
+  @JsonManagedReference
+  private Post mainPost;
+
+  @OneToMany(mappedBy = "mainPost", fetch = FetchType.LAZY)
+  @JsonBackReference
+  private Set<Post> replies = new HashSet<>();
+
+  private Long replyCount;
+
   public Post(String content, Profile profile, PostType type) {
     this.content = content;
     this.profile = profile;
     this.type = type;
     this.likeCount = 0L;
+    this.replyCount = 0L;
+    this.hotnessScore = this.likeCount * 0.6 + ((double) this.postedAt.toEpochMilli() / 3600000000L) * 0.4;
+  }
+
+  public Post(String content, Profile profile, Post mainPost) {
+    this.content = content;
+    this.profile = profile;
+    this.type = PostType.REPLY;
+    this.likeCount = 0L;
+    this.replyCount = 0L;
     this.hotnessScore = this.likeCount * 0.6 + ((double) this.postedAt.toEpochMilli() / 3600000000L) * 0.4;
   }
 
