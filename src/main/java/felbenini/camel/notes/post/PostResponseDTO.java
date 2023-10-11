@@ -38,19 +38,23 @@ public class PostResponseDTO {
     this.liked = false;
   }
 
-  public PostResponseDTO(Post post, boolean isLiked) {
+  public PostResponseDTO(Post post, Profile profileReq) {
     this.id = post.getId();
     this.content = post.getContent();
     this.postedAt = post.getPostedAt();
     this.likeCount = post.getLikeCount();
     this.type = post.getType();
-    this.profile = new ProfileResponseDTO(post.getProfile());
+    this.profile = new ProfileResponseDTO(post.getProfile(), profileReq);
     if (post.getMainPost() == null) {
       this.mainPost = null;
     } else {
-      this.mainPost = new PostResponseDTO(post.getMainPost(), isLiked);
+      this.mainPost = new PostResponseDTO(post.getMainPost(), profileReq);
     }
     this.replyCount = post.getReplyCount();
-    this.liked = isLiked;
+    this.liked = this.isLiked(post, profileReq);
+  }
+
+  private boolean isLiked(Post post, Profile profile) {
+    return post.getLikedBy().contains(profile);
   }
 }

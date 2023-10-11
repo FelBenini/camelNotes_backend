@@ -2,8 +2,11 @@ package felbenini.camel.notes.post;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/post")
@@ -22,8 +25,9 @@ public class PostController {
   }
 
   @GetMapping("/feed")
-  public ResponseEntity getFollowingPosts(@RequestHeader(value = "Authorization") String token, @RequestParam(value = "page", required = false) Integer page) {
+  public ResponseEntity getFollowingPosts(@RequestHeader(value = "Authorization", required = false) String token, @RequestParam(value = "page", required = false) Integer page) {
     if (page == null) page = 1;
+    if (token == null) return this.postService.getRecentPosts(page);
     return this.postService.getPostsFromFollowing(token, page);
   }
 

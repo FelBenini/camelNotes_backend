@@ -52,7 +52,8 @@ public class PostService {
 
   public ResponseEntity getHotPosts(Integer page, String token) {
     Page<Post> posts = this.postRepository.findAll(PageRequest.of(page - 1, 15, Sort.by(Sort.Direction.DESC, "hotnessScore")));
-    Page<PostResponseDTO> postsResponse = posts.map(post -> new PostResponseDTO(post, this.checkIfPostIsLikedWithToken(token, post)));
+    Profile profileReq = profileService.extractProfileFromToken(token);
+    Page<PostResponseDTO> postsResponse = posts.map(post -> new PostResponseDTO(post, profileReq));
     return ResponseEntity.ok(postsResponse);
   }
 
@@ -86,14 +87,15 @@ public class PostService {
     postValue.setReplyCount(postValue.getReplyCount() + 1);
     postRepository.save(postValue);
     postRepository.save(reply);
-    return ResponseEntity.ok(new PostResponseDTO(reply, this.checkIfPostIsLikedWithToken(token, reply)));
+    return ResponseEntity.ok(new PostResponseDTO(reply, profileService.extractProfileFromToken(token)));
   }
 
   public ResponseEntity getReplies(String postId, Integer page, String token) {
     Optional<Post> post = postRepository.findById(postId);
     if (post.isEmpty()) return ResponseEntity.notFound().build();
     Page<Post> replies = postRepository.findByMainPost_Id(postId, PageRequest.of(page - 1, 15));
-    Page<PostResponseDTO> repliesDTO = replies.map(p -> new PostResponseDTO(p, this.checkIfPostIsLikedWithToken(token, p)));
+    Profile profileReq = profileService.extractProfileFromToken(token);
+    Page<PostResponseDTO> repliesDTO = replies.map(p -> new PostResponseDTO(p, profileReq));
     return ResponseEntity.ok(repliesDTO);
   }
 
@@ -109,5 +111,11 @@ public class PostService {
     if (token == null) return false;
     Profile profile = profileService.extractProfileFromToken(token);
     return post.getLikedBy().contains(profile);
+  }
+
+  public ResponseEntity getRecentPosts(Integer page) {
+    Page<Post> posts = postRepository.findAll(PageRequest.of(page - 1, 15));
+    Page<PostResponseDTO> response = posts.map(PostResponseDTO::new);
+    return ResponseEntity.ok(response);
   }
 }

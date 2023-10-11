@@ -23,9 +23,13 @@ public class ProfileController {
   private TokenService tokenService;
 
   @GetMapping("/{username}")
-  public ResponseEntity getProfile(@PathVariable("username") String username) {
+  public ResponseEntity getProfile(@PathVariable("username") String username, @RequestHeader(value = "Authorization", required = false) String token) {
     Profile profile = profileRepository.findByUsername(username);
     if (profile == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    if (token != null) {
+      Profile profileReq = this.profileService.extractProfileFromToken(token);
+      return ResponseEntity.ok(new ProfileResponseDTO(profile, profileReq));
+    }
     return ResponseEntity.ok(new ProfileResponseDTO(profile));
   }
 
