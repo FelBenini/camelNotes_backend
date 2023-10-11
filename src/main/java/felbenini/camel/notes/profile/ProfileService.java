@@ -54,6 +54,7 @@ public class ProfileService {
   }
 
   public Profile extractProfileFromToken(String token) {
+    if (token == null) return null;
     token = token.replace("Bearer ", "");
     String username = this.tokenService.extractUsername(token);
     return this.profileRepository.findByUsername(username);

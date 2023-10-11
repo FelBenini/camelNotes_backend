@@ -55,6 +55,7 @@ public class PostResponseDTO {
   }
 
   private boolean isLiked(Post post, Profile profile) {
+    if (profile == null) return false;
     return post.getLikedBy().contains(profile);
   }
 }
