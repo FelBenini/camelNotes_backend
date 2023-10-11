@@ -62,7 +62,7 @@ public class ProfileService {
   public ResponseEntity editProfile(String authToken, ProfileEditDTO data) {
     Profile userProfile = this.extractProfileFromToken(authToken);
     if (userProfile == null) return ResponseEntity.notFound().build();
-    userProfile.setDisplayName(data.displayName());
+    if (data.displayName() != null) userProfile.setDisplayName(data.displayName());
     userProfile.setDescription(data.description());
     profileRepository.save(userProfile);
     return ResponseEntity.ok(new ProfileResponseDTO(userProfile));
