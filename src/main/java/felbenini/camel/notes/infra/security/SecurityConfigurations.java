@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -35,6 +36,8 @@ public class SecurityConfigurations {
             .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/post/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/profile/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
             .requestMatchers("/error").permitAll()
             .anyRequest().authenticated()
         )
