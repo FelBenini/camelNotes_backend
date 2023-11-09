@@ -68,7 +68,6 @@ public class TokenService {
     } catch (NullPointerException | SignatureException e) {
       return false;
     }
-
   }
 
   public String generateToken(UserDetails userDetails) {
